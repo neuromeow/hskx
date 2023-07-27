@@ -1,7 +1,10 @@
 use std::error::Error;
 
+use clap::Parser;
 use csv;
 use serde::Deserialize;
+
+use crate::cli::{Cli, Commands};
 
 #[derive(Deserialize)]
 struct Word {
@@ -22,13 +25,23 @@ fn read_from_file_and_deserialize(path: &str) -> Result<Vec<Word>, Box<dyn Error
     Ok(result)
 }
 
-pub fn run() -> Result<(), Box<dyn Error>> {
+pub fn print_wordlist() -> Result<(), Box<dyn Error>> {
     let words = read_from_file_and_deserialize("./src/data/wordlist.csv")?;
     for word in words {
         println!(
             "{} {} {} {} {}",
             word.word_number, word.chinese, word.pinyin, word.english, word.hsk_level
         )
+    }
+    Ok(())
+}
+
+pub fn run() -> Result<(), Box<dyn Error>> {
+    let cli = Cli::parse();
+    match &cli.command {
+        Commands::Wordlist => {
+            print_wordlist()?;
+        }
     }
     Ok(())
 }
