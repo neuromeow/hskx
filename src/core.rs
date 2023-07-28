@@ -25,6 +25,7 @@ fn read_from_file_and_deserialize(path: &str) -> Result<Vec<Word>, Box<dyn Error
     Ok(result)
 }
 
+#[warn(dead_code)]
 pub fn print_wordlist() -> Result<(), Box<dyn Error>> {
     let words = read_from_file_and_deserialize("./src/data/wordlist.csv")?;
     for word in words {
@@ -38,9 +39,18 @@ pub fn print_wordlist() -> Result<(), Box<dyn Error>> {
 
 pub fn run() -> Result<(), Box<dyn Error>> {
     let cli = Cli::parse();
+    let mut words = read_from_file_and_deserialize("./src/data/wordlist.csv")?;
+    if let Some(levels) = cli.levels {
+        words.retain(|word| levels.contains(&word.hsk_level))
+    }
     match &cli.command {
         Commands::Wordlist => {
-            print_wordlist()?;
+            for word in words {
+                println!(
+                    "{} {} {} {} {}",
+                    word.word_number, word.chinese, word.pinyin, word.english, word.hsk_level
+                );
+            }
         }
     }
     Ok(())
