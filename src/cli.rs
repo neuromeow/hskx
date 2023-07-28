@@ -1,5 +1,4 @@
 use clap::{Parser, Subcommand};
-use std::ops::Range;
 
 #[derive(Parser)]
 #[command(version)]
@@ -12,5 +11,8 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
-    Wordlist,
+    Wordlist {
+        #[arg(short, long)]
+        numbers: bool,
+    },
 }
