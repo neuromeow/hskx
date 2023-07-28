@@ -15,6 +15,12 @@ struct Word {
     hsk_level: u8,
 }
 
+impl std::fmt::Display for Word {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{} {} {}", self.chinese, self.pinyin, self.english)
+    }
+}
+
 fn read_from_file_and_deserialize(path: &str) -> Result<Vec<Word>, Box<dyn Error>> {
     let mut reader = csv::Reader::from_path(path)?;
     let mut result = Vec::new();
@@ -25,18 +31,6 @@ fn read_from_file_and_deserialize(path: &str) -> Result<Vec<Word>, Box<dyn Error
     Ok(result)
 }
 
-#[warn(dead_code)]
-pub fn print_wordlist() -> Result<(), Box<dyn Error>> {
-    let words = read_from_file_and_deserialize("./src/data/wordlist.csv")?;
-    for word in words {
-        println!(
-            "{} {} {} {} {}",
-            word.word_number, word.chinese, word.pinyin, word.english, word.hsk_level
-        )
-    }
-    Ok(())
-}
-
 pub fn run() -> Result<(), Box<dyn Error>> {
     let cli = Cli::parse();
     let mut words = read_from_file_and_deserialize("./src/data/wordlist.csv")?;
@@ -45,11 +39,14 @@ pub fn run() -> Result<(), Box<dyn Error>> {
     }
     match &cli.command {
         Commands::Wordlist { numbers } => {
-            for word in words {
-                println!(
-                    "{} {} {} {} {}",
-                    word.word_number, word.chinese, word.pinyin, word.english, word.hsk_level
-                );
+            if *numbers == true {
+                for word in words {
+                    println!("{} {}", word.word_number, word);
+                }
+            } else {
+                for word in words {
+                    println!("{}", word);
+                }
             }
         }
     }
