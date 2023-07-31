@@ -1,5 +1,5 @@
 use std::error::Error;
-use std::io;
+use std::{io, thread, time};
 
 use clap::Parser;
 use csv;
@@ -39,12 +39,20 @@ pub fn run() -> Result<(), Box<dyn Error>> {
         words.retain(|word| levels.contains(&word.hsk_level))
     }
     match &cli.command {
-        Commands::Train => {
-            for word in words {
-                println!("{}", word.chinese);
-                // As a way to wait for user input
-                let mut buffer = String::new();
-                io::stdin().read_line(&mut buffer)?;
+        Commands::Train { delay } => {
+            if let Some(delay) = delay {
+                let delay_duration = time::Duration::from_secs(*delay);
+                for word in words {
+                    println!("{}\n", word.chinese);
+                    thread::sleep(delay_duration);
+                }
+            } else {
+                for word in words {
+                    println!("{}", word.chinese);
+                    // As a way to wait for user input
+                    let mut buffer = String::new();
+                    io::stdin().read_line(&mut buffer)?;
+                }
             }
         }
         Commands::Wordlist { numbers } => {
