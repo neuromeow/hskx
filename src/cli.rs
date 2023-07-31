@@ -11,7 +11,10 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
-    Train,
+    Train {
+        #[arg(short, long)]
+        delay: Option<u64>,
+    },
     Wordlist {
         #[arg(short, long)]
         numbers: bool,

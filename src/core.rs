@@ -39,7 +39,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
         words.retain(|word| levels.contains(&word.hsk_level))
     }
     match &cli.command {
-        Commands::Train => {
+        Commands::Train { delay } => {
             for word in words {
                 println!("{}", word.chinese);
                 // As a way to wait for user input
