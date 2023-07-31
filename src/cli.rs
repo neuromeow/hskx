@@ -11,6 +11,7 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
+    Train,
     Wordlist {
         #[arg(short, long)]
         numbers: bool,
