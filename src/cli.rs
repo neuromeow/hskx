@@ -15,6 +15,8 @@ pub enum Commands {
         #[arg(short, long)]
         pinyin: bool,
         #[arg(short, long)]
+        english: bool,
+        #[arg(short, long)]
         delay: Option<u64>,
     },
     Wordlist {
