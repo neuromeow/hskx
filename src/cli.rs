@@ -13,6 +13,8 @@ pub struct Cli {
 pub enum Commands {
     Train {
         #[arg(short, long)]
+        pinyin: bool,
+        #[arg(short, long)]
         delay: Option<u64>,
     },
     Wordlist {
