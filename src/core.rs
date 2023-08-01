@@ -43,12 +43,20 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             if let Some(delay) = delay {
                 let delay_duration = time::Duration::from_secs(*delay);
                 for word in words {
-                    println!("{}\n", word.chinese);
+                    if *pinyin == true {
+                        println!("{} {}\n", word.chinese, word.pinyin);
+                    } else {
+                        println!("{}\n", word.chinese);
+                    }
                     thread::sleep(delay_duration);
                 }
             } else {
                 for word in words {
-                    println!("{}", word.chinese);
+                    if *pinyin == true {
+                        println!("{} {}\n", word.chinese, word.pinyin);
+                    } else {
+                        println!("{}\n", word.chinese);
+                    }
                     // As a way to wait for user input
                     let mut buffer = String::new();
                     io::stdin().read_line(&mut buffer)?;
