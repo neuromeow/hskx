@@ -39,12 +39,20 @@ pub fn run() -> Result<(), Box<dyn Error>> {
         words.retain(|word| levels.contains(&word.hsk_level))
     }
     match &cli.command {
-        Commands::Train { pinyin, english, delay } => {
+        Commands::Train {
+            no_hieroglyph,
+            pinyin,
+            english,
+            delay,
+        } => {
             if let Some(delay) = delay {
                 let delay_duration = time::Duration::from_secs(*delay);
                 for word in words {
-                    let mut printing_string = String::from(&word.chinese);
-                    printing_string.push(' ');
+                    let mut printing_string = String::new();
+                    if *no_hieroglyph == false {
+                        printing_string.push_str(&word.chinese);
+                        printing_string.push(' ');
+                    }
                     if *pinyin == true {
                         printing_string.push_str(&word.pinyin);
                     }
@@ -57,8 +65,11 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 }
             } else {
                 for word in words {
-                    let mut printing_string = String::from(&word.chinese);
-                    printing_string.push(' ');
+                    let mut printing_string = String::new();
+                    if *no_hieroglyph == false {
+                        printing_string.push_str(&word.chinese);
+                        printing_string.push(' ');
+                    }
                     if *pinyin == true {
                         printing_string.push_str(&word.pinyin);
                     }
