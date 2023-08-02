@@ -13,6 +13,8 @@ pub struct Cli {
 pub enum Commands {
     Train {
         #[arg(short, long)]
+        no_hieroglyph: bool,
+        #[arg(short, long)]
         pinyin: bool,
         #[arg(short, long)]
         english: bool,
