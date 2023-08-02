@@ -43,6 +43,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             no_hieroglyph,
             pinyin,
             english,
+            answer,
             delay,
         } => {
             if let Some(delay) = delay {
