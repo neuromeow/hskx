@@ -63,6 +63,9 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                     }
                     println!("{}\n", printing_string);
                     thread::sleep(delay_duration);
+                    if *answer == true {
+                        println!("{}", word);
+                    }
                 }
             } else {
                 for word in words {
@@ -82,6 +85,9 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                     // As a way to wait for user input
                     let mut buffer = String::new();
                     io::stdin().read_line(&mut buffer)?;
+                    if *answer == true {
+                        println!("{}", word);
+                    }
                 }
             }
         }
