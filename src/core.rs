@@ -54,6 +54,25 @@ fn render_question_string(
     question_string
 }
 
+fn print_question_string_with_delay(
+    words: Vec<Word>,
+    delay: u64,
+    no_hieroglyph: &bool,
+    pinyin: &bool,
+    english: &bool,
+    answer: &bool,
+) {
+    let delay_duration = time::Duration::from_secs(delay);
+    for word in words {
+        let question_string = render_question_string(word.clone(), no_hieroglyph, pinyin, english);
+        println!("{}\n", question_string);
+        thread::sleep(delay_duration);
+        if *answer == true {
+            println!("{}", word);
+        }
+    }
+}
+
 pub fn run() -> Result<(), Box<dyn Error>> {
     let cli = Cli::parse();
     let mut words = read_from_file_and_deserialize("./src/data/wordlist.csv")?;
@@ -74,16 +93,14 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 words.shuffle(&mut rng);
             }
             if let Some(delay) = delay {
-                let delay_duration = time::Duration::from_secs(*delay);
-                for word in words {
-                    let question_string =
-                        render_question_string(word.clone(), no_hieroglyph, pinyin, english);
-                    println!("{}\n", question_string);
-                    thread::sleep(delay_duration);
-                    if *answer == true {
-                        println!("{}", word);
-                    }
-                }
+                print_question_string_with_delay(
+                    words,
+                    *delay,
+                    no_hieroglyph,
+                    pinyin,
+                    english,
+                    answer,
+                );
             } else {
                 for word in words {
                     let question_string =
