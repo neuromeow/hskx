@@ -93,6 +93,18 @@ fn print_question_string_waiting_input(
     Ok(())
 }
 
+fn print_wordlist(words: Vec<Word>, numbers: &bool) {
+    if *numbers == true {
+        for word in words {
+            println!("{} {}", word.word_number, word);
+        }
+    } else {
+        for word in words {
+            println!("{}", word);
+        }
+    }
+}
+
 pub fn run() -> Result<(), Box<dyn Error>> {
     let cli = Cli::parse();
     let mut words = read_from_file_and_deserialize("./src/data/wordlist.csv")?;
@@ -126,15 +138,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             }
         }
         Commands::Wordlist { numbers } => {
-            if *numbers == true {
-                for word in words {
-                    println!("{} {}", word.word_number, word);
-                }
-            } else {
-                for word in words {
-                    println!("{}", word);
-                }
-            }
+            print_wordlist(words, numbers);
         }
     }
     Ok(())
