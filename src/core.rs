@@ -9,7 +9,7 @@ use serde::Deserialize;
 
 use crate::cli::{Cli, Commands};
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 struct Word {
     word_number: u32,
     chinese: String,
@@ -34,6 +34,26 @@ fn read_from_file_and_deserialize(path: &str) -> Result<Vec<Word>, Box<dyn Error
     Ok(result)
 }
 
+fn render_question_string(
+    word: Word,
+    no_hieroglyph: &bool,
+    english: &bool,
+    pinyin: &bool,
+) -> String {
+    let mut question_words = Vec::new();
+    if *no_hieroglyph == false {
+        question_words.push(word.chinese);
+    }
+    if *pinyin == true {
+        question_words.push(word.pinyin);
+    }
+    if *english == true {
+        question_words.push(word.english);
+    }
+    let question_string = question_words.join(" ");
+    question_string
+}
+
 pub fn run() -> Result<(), Box<dyn Error>> {
     let cli = Cli::parse();
     let mut words = read_from_file_and_deserialize("./src/data/wordlist.csv")?;
@@ -56,19 +76,9 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             if let Some(delay) = delay {
                 let delay_duration = time::Duration::from_secs(*delay);
                 for word in words {
-                    let mut printing_string = String::new();
-                    if *no_hieroglyph == false {
-                        printing_string.push_str(&word.chinese);
-                        printing_string.push(' ');
-                    }
-                    if *pinyin == true {
-                        printing_string.push_str(&word.pinyin);
-                    }
-                    if *english == true {
-                        printing_string.push(' ');
-                        printing_string.push_str(&word.english);
-                    }
-                    println!("{}\n", printing_string);
+                    let question_string =
+                        render_question_string(word.clone(), no_hieroglyph, pinyin, english);
+                    println!("{}\n", question_string);
                     thread::sleep(delay_duration);
                     if *answer == true {
                         println!("{}", word);
@@ -76,19 +86,9 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 }
             } else {
                 for word in words {
-                    let mut printing_string = String::new();
-                    if *no_hieroglyph == false {
-                        printing_string.push_str(&word.chinese);
-                        printing_string.push(' ');
-                    }
-                    if *pinyin == true {
-                        printing_string.push_str(&word.pinyin);
-                    }
-                    if *english == true {
-                        printing_string.push(' ');
-                        printing_string.push_str(&word.english);
-                    }
-                    println!("{}", printing_string);
+                    let question_string =
+                        render_question_string(word.clone(), no_hieroglyph, pinyin, english);
+                    println!("{}", question_string);
                     // As a way to wait for user input
                     let mut buffer = String::new();
                     io::stdin().read_line(&mut buffer)?;
