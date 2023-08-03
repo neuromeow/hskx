@@ -3,6 +3,8 @@ use std::{io, thread, time};
 
 use clap::Parser;
 use csv;
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 use serde::Deserialize;
 
 use crate::cli::{Cli, Commands};
@@ -47,6 +49,10 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             shuffle,
             delay,
         } => {
+            if *shuffle == true {
+                let mut rng = thread_rng();
+                words.shuffle(&mut rng);
+            }
             if let Some(delay) = delay {
                 let delay_duration = time::Duration::from_secs(*delay);
                 for word in words {
