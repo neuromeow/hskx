@@ -68,9 +68,29 @@ fn print_question_string_with_delay(
         println!("{}\n", question_string);
         thread::sleep(delay_duration);
         if *answer == true {
-            println!("{}", word);
+            println!("{}\n", word);
         }
     }
+}
+
+fn print_question_string_waiting_input(
+    words: Vec<Word>,
+    no_hieroglyph: &bool,
+    pinyin: &bool,
+    english: &bool,
+    answer: &bool,
+) -> Result<(), Box<dyn Error>> {
+    for word in words {
+        let question_string = render_question_string(word.clone(), no_hieroglyph, pinyin, english);
+        println!("{}", question_string);
+        // As a way to wait for user input
+        let mut buffer = String::new();
+        io::stdin().read_line(&mut buffer)?;
+        if *answer == true {
+            println!("{}\n", word);
+        }
+    }
+    Ok(())
 }
 
 pub fn run() -> Result<(), Box<dyn Error>> {
@@ -102,17 +122,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                     answer,
                 );
             } else {
-                for word in words {
-                    let question_string =
-                        render_question_string(word.clone(), no_hieroglyph, pinyin, english);
-                    println!("{}", question_string);
-                    // As a way to wait for user input
-                    let mut buffer = String::new();
-                    io::stdin().read_line(&mut buffer)?;
-                    if *answer == true {
-                        println!("{}", word);
-                    }
-                }
+                print_question_string_waiting_input(words, no_hieroglyph, pinyin, english, answer)?;
             }
         }
         Commands::Wordlist { numbers } => {
