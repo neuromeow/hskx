@@ -44,6 +44,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             pinyin,
             english,
             answer,
+            shuffle,
             delay,
         } => {
             if let Some(delay) = delay {
