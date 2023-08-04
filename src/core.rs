@@ -9,6 +9,8 @@ use serde::Deserialize;
 
 use crate::cli::{Cli, Commands};
 
+const ERROR_HELP_MESSAGE: &str = "For more information, try '--help'.";
+
 #[derive(Clone, Deserialize)]
 struct Word {
     word_number: u32,
@@ -123,6 +125,14 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             if *shuffle == true {
                 let mut rng = thread_rng();
                 words.shuffle(&mut rng);
+            }
+            if (*no_hieroglyph, *pinyin, *english) == (true, false, false) {
+                eprintln!(
+                    "error: it is not possible to use the 'no-hieroglyph' option without using \
+                    the 'pinyin' or 'english' options or both.\n\n{}",
+                    ERROR_HELP_MESSAGE
+                );
+                std::process::exit(1);
             }
             if let Some(delay) = delay {
                 print_question_string_with_delay(
