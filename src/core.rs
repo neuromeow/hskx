@@ -26,24 +26,19 @@ impl std::fmt::Display for Word {
     }
 }
 
-fn read_from_file_and_deserialize(path: &str) -> Result<Vec<Word>, Box<dyn Error>> {
-    let mut reader = csv::Reader::from_path(path)?;
-    let mut result = Vec::new();
-    for record in reader.deserialize() {
-        let word_record: Word = record?;
-        result.push(word_record)
+fn read_records_from_cvs_file_and_deserialize(path: &str) -> Result<Vec<Word>, Box<dyn Error>> {
+    let mut csv_reader = csv::Reader::from_path(path)?;
+    let mut deserialized_records_from_file = Vec::new();
+    for record in csv_reader.deserialize() {
+        let deserialized_record: Word = record?;
+        deserialized_records_from_file.push(deserialized_record)
     }
-    Ok(result)
+    Ok(deserialized_records_from_file)
 }
 
-fn render_question_string(
-    word: Word,
-    no_hieroglyph: &bool,
-    english: &bool,
-    pinyin: &bool,
-) -> String {
+fn render_question_string(word: Word, no_chinese: &bool, pinyin: &bool, english: &bool) -> String {
     let mut question_words = Vec::new();
-    if *no_hieroglyph == false {
+    if *no_chinese == false {
         question_words.push(word.chinese);
     }
     if *pinyin == true {
@@ -58,15 +53,15 @@ fn render_question_string(
 
 fn print_question_string_with_delay(
     words: Vec<Word>,
-    delay: u64,
-    no_hieroglyph: &bool,
+    no_chinese: &bool,
     pinyin: &bool,
     english: &bool,
     answer: &bool,
+    delay: u64,
 ) {
     let delay_duration = time::Duration::from_secs(delay);
     for word in words {
-        let question_string = render_question_string(word.clone(), no_hieroglyph, pinyin, english);
+        let question_string = render_question_string(word.clone(), no_chinese, pinyin, english);
         println!("{}\n", question_string);
         thread::sleep(delay_duration);
         if *answer == true {
@@ -77,13 +72,13 @@ fn print_question_string_with_delay(
 
 fn print_question_string_waiting_input(
     words: Vec<Word>,
-    no_hieroglyph: &bool,
+    no_chinese: &bool,
     pinyin: &bool,
     english: &bool,
     answer: &bool,
 ) -> Result<(), Box<dyn Error>> {
     for word in words {
-        let question_string = render_question_string(word.clone(), no_hieroglyph, pinyin, english);
+        let question_string = render_question_string(word.clone(), no_chinese, pinyin, english);
         println!("{}", question_string);
         // As a way to wait for user input
         let mut buffer = String::new();
@@ -109,42 +104,38 @@ fn print_wordlist(words: Vec<Word>, numbers: &bool) {
 
 pub fn run() -> Result<(), Box<dyn Error>> {
     let cli = Cli::parse();
-    let mut words = read_from_file_and_deserialize("./src/data/wordlist.csv")?;
+    let mut words = read_records_from_cvs_file_and_deserialize("./src/data/wordlist.csv")?;
     if let Some(levels) = cli.levels {
         words.retain(|word| levels.contains(&word.hsk_level))
     }
     match &cli.command {
         Commands::Train {
-            no_hieroglyph,
+            no_chinese,
             pinyin,
             english,
             answer,
             shuffle,
             delay,
         } => {
-            if *shuffle == true {
-                let mut rng = thread_rng();
-                words.shuffle(&mut rng);
-            }
-            if (*no_hieroglyph, *pinyin, *english) == (true, false, false) {
+            // Perhaps this scenario can be handled using 'clap' features
+            if (*no_chinese, *pinyin, *english) == (true, false, false) {
                 eprintln!(
-                    "error: it is not possible to use the 'no-hieroglyph' option without using \
+                    "error: it is not possible to use the 'no-chinese' option without using \
                     the 'pinyin' or 'english' options or both.\n\n{}",
                     ERROR_HELP_MESSAGE
                 );
                 std::process::exit(1);
             }
+            if *shuffle == true {
+                let mut rng = thread_rng();
+                words.shuffle(&mut rng);
+            }
             if let Some(delay) = delay {
                 print_question_string_with_delay(
-                    words,
-                    *delay,
-                    no_hieroglyph,
-                    pinyin,
-                    english,
-                    answer,
+                    words, no_chinese, pinyin, english, answer, *delay,
                 );
             } else {
-                print_question_string_waiting_input(words, no_hieroglyph, pinyin, english, answer)?;
+                print_question_string_waiting_input(words, no_chinese, pinyin, english, answer)?;
             }
         }
         Commands::Wordlist { numbers } => {
