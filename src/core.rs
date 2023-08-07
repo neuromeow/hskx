@@ -5,6 +5,8 @@ use std::error::Error;
 
 use crate::cli::{Cli, Commands};
 
+const WORDLIST_CSV_FILE: &[u8] =
+    include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/data/wordlist.csv"));
 const ERROR_HELP_MESSAGE: &str = "For more information, try '--help'.";
 
 #[derive(Clone, Deserialize)]
@@ -22,14 +24,16 @@ impl std::fmt::Display for Word {
     }
 }
 
-fn read_records_from_cvs_file_and_deserialize(path: &str) -> Result<Vec<Word>, Box<dyn Error>> {
-    let mut csv_reader = csv::Reader::from_path(path)?;
-    let mut deserialized_records_from_file = Vec::new();
-    for record in csv_reader.deserialize() {
+fn read_records_from_wordlist_csv_file_and_deserialize() -> Result<Vec<Word>, Box<dyn Error>> {
+    let mut reader = csv::ReaderBuilder::new()
+        .delimiter(b';')
+        .from_reader(WORDLIST_CSV_FILE);
+    let mut deserialized_records_from_wordlist_file = Vec::new();
+    for record in reader.deserialize() {
         let deserialized_record: Word = record?;
-        deserialized_records_from_file.push(deserialized_record)
+        deserialized_records_from_wordlist_file.push(deserialized_record)
     }
-    Ok(deserialized_records_from_file)
+    Ok(deserialized_records_from_wordlist_file)
 }
 
 fn render_question_string(word: Word, no_chinese: &bool, pinyin: &bool, english: &bool) -> String {
@@ -99,7 +103,7 @@ fn print_wordlist(words: Vec<Word>, numbers: &bool) {
 
 pub fn run() -> Result<(), Box<dyn Error>> {
     let cli = Cli::parse();
-    let mut words = read_records_from_cvs_file_and_deserialize("./src/data/wordlist.csv")?;
+    let mut words = read_records_from_wordlist_csv_file_and_deserialize()?;
     match &cli.command {
         Commands::Train {
             levels,
