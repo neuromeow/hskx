@@ -1,23 +1,21 @@
-use std::error::Error;
-use std::{io, thread, time};
-
 use clap::Parser;
-use csv;
+use colored::Colorize;
 use rand::seq::SliceRandom;
-use rand::thread_rng;
 use serde::Deserialize;
+use std::error::Error;
 
 use crate::cli::{Cli, Commands};
 
-const ERROR_HELP_MESSAGE: &str = "For more information, try '--help'.";
+const WORDLIST_CSV: &[u8] =
+    include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/data/wordlist.csv"));
 
 #[derive(Clone, Deserialize)]
 struct Word {
-    word_number: u32,
+    number: u32,
     chinese: String,
     pinyin: String,
     english: String,
-    hsk_level: u8,
+    level: u8,
 }
 
 impl std::fmt::Display for Word {
@@ -26,51 +24,52 @@ impl std::fmt::Display for Word {
     }
 }
 
-fn read_records_from_cvs_file_and_deserialize(path: &str) -> Result<Vec<Word>, Box<dyn Error>> {
-    let mut csv_reader = csv::Reader::from_path(path)?;
-    let mut deserialized_records_from_file = Vec::new();
-    for record in csv_reader.deserialize() {
+fn read_records_from_wordlist_csv_and_deserialize() -> Result<Vec<Word>, Box<dyn Error>> {
+    let mut reader = csv::ReaderBuilder::new()
+        .delimiter(b';')
+        .from_reader(WORDLIST_CSV);
+    let mut deserialized_records_from_wordlist_csv = Vec::new();
+    for record in reader.deserialize() {
         let deserialized_record: Word = record?;
-        deserialized_records_from_file.push(deserialized_record)
+        deserialized_records_from_wordlist_csv.push(deserialized_record)
     }
-    Ok(deserialized_records_from_file)
+    Ok(deserialized_records_from_wordlist_csv)
 }
 
 fn render_question_string(word: Word, no_chinese: &bool, pinyin: &bool, english: &bool) -> String {
-    let mut question_words = Vec::new();
-    if *no_chinese == false {
-        question_words.push(word.chinese);
+    let mut question_string = Vec::new();
+    if !(*no_chinese) {
+        question_string.push(word.chinese);
     }
-    if *pinyin == true {
-        question_words.push(word.pinyin);
+    if *pinyin {
+        question_string.push(word.pinyin);
     }
-    if *english == true {
-        question_words.push(word.english);
+    if *english {
+        question_string.push(word.english);
     }
-    let question_string = question_words.join(" ");
-    question_string
+    question_string.join(" ")
 }
 
-fn print_question_string_with_delay(
+fn print_question_strings_with_delay(
     words: Vec<Word>,
     no_chinese: &bool,
     pinyin: &bool,
     english: &bool,
     answer: &bool,
-    delay: u64,
+    delay: &u64,
 ) {
-    let delay_duration = time::Duration::from_secs(delay);
+    let delay_duration = std::time::Duration::from_secs(*delay);
     for word in words {
         let question_string = render_question_string(word.clone(), no_chinese, pinyin, english);
         println!("{}\n", question_string);
-        thread::sleep(delay_duration);
-        if *answer == true {
+        std::thread::sleep(delay_duration);
+        if *answer {
             println!("{}\n", word);
         }
     }
 }
 
-fn print_question_string_waiting_input(
+fn print_question_strings_with_waiting_for_input(
     words: Vec<Word>,
     no_chinese: &bool,
     pinyin: &bool,
@@ -82,8 +81,8 @@ fn print_question_string_waiting_input(
         println!("{}", question_string);
         // As a way to wait for user input
         let mut buffer = String::new();
-        io::stdin().read_line(&mut buffer)?;
-        if *answer == true {
+        std::io::stdin().read_line(&mut buffer)?;
+        if *answer {
             println!("{}\n", word);
         }
     }
@@ -91,9 +90,9 @@ fn print_question_string_waiting_input(
 }
 
 fn print_wordlist(words: Vec<Word>, numbers: &bool) {
-    if *numbers == true {
+    if *numbers {
         for word in words {
-            println!("{} {}", word.word_number, word);
+            println!("{} {}", word.number, word);
         }
     } else {
         for word in words {
@@ -104,12 +103,10 @@ fn print_wordlist(words: Vec<Word>, numbers: &bool) {
 
 pub fn run() -> Result<(), Box<dyn Error>> {
     let cli = Cli::parse();
-    let mut words = read_records_from_cvs_file_and_deserialize("./src/data/wordlist.csv")?;
-    if let Some(levels) = cli.levels {
-        words.retain(|word| levels.contains(&word.hsk_level))
-    }
+    let mut words = read_records_from_wordlist_csv_and_deserialize()?;
     match &cli.command {
         Commands::Train {
+            levels,
             no_chinese,
             pinyin,
             english,
@@ -117,28 +114,36 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             shuffle,
             delay,
         } => {
+            if let Some(level_numbers) = levels {
+                words.retain(|word| level_numbers.contains(&word.level))
+            }
             // Perhaps this scenario can be handled using 'clap' features
-            if (*no_chinese, *pinyin, *english) == (true, false, false) {
-                eprintln!(
-                    "error: it is not possible to use the 'no-chinese' option without using \
-                    the 'pinyin' or 'english' options or both.\n\n{}",
-                    ERROR_HELP_MESSAGE
+            if (no_chinese, pinyin, english) == (&true, &false, &false) {
+                let options_mismatch_error = format!(
+                    "{}: it is not possible to use '{}' without using '{}' or '{}' or both\n\nFor more information, try '{}'.",
+                    "error".red(),
+                    "--no-chinese".bold(),
+                    "--pinyin".bold(),
+                    "--english".bold(),
+                    "--help".bold()
                 );
+                eprintln!("{}", options_mismatch_error);
                 std::process::exit(1);
             }
-            if *shuffle == true {
-                let mut rng = thread_rng();
+            if *shuffle {
+                let mut rng = rand::thread_rng();
                 words.shuffle(&mut rng);
             }
-            if let Some(delay) = delay {
-                print_question_string_with_delay(
-                    words, no_chinese, pinyin, english, answer, *delay,
-                );
+            if *delay > 0u64 {
+                print_question_strings_with_delay(words, no_chinese, pinyin, english, answer, delay);
             } else {
-                print_question_string_waiting_input(words, no_chinese, pinyin, english, answer)?;
+                print_question_strings_with_waiting_for_input(words, no_chinese, pinyin, english, answer)?;
             }
         }
-        Commands::Wordlist { numbers } => {
+        Commands::Wordlist { levels, numbers } => {
+            if let Some(level_numbers) = levels {
+                words.retain(|word| level_numbers.contains(&word.level))
+            }
             print_wordlist(words, numbers);
         }
     }
