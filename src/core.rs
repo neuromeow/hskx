@@ -1,10 +1,7 @@
-use std::error::Error;
-use std::{io, thread, time};
-
 use clap::Parser;
 use rand::seq::SliceRandom;
-use rand::thread_rng;
 use serde::Deserialize;
+use std::error::Error;
 
 use crate::cli::{Cli, Commands};
 
@@ -37,7 +34,7 @@ fn read_records_from_cvs_file_and_deserialize(path: &str) -> Result<Vec<Word>, B
 
 fn render_question_string(word: Word, no_chinese: &bool, pinyin: &bool, english: &bool) -> String {
     let mut question_words = Vec::new();
-    if !no_chinese {
+    if !(*no_chinese) {
         question_words.push(word.chinese);
     }
     if *pinyin {
@@ -57,11 +54,11 @@ fn print_question_string_with_delay(
     answer: &bool,
     delay: &u64,
 ) {
-    let delay_duration = time::Duration::from_secs(*delay);
+    let delay_duration = std::time::Duration::from_secs(*delay);
     for word in words {
         let question_string = render_question_string(word.clone(), no_chinese, pinyin, english);
         println!("{}\n", question_string);
-        thread::sleep(delay_duration);
+        std::thread::sleep(delay_duration);
         if *answer {
             println!("{}\n", word);
         }
@@ -80,7 +77,7 @@ fn print_question_string_waiting_input(
         println!("{}", question_string);
         // As a way to wait for user input
         let mut buffer = String::new();
-        io::stdin().read_line(&mut buffer)?;
+        std::io::stdin().read_line(&mut buffer)?;
         if *answer {
             println!("{}\n", word);
         }
@@ -126,7 +123,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 std::process::exit(1);
             }
             if *shuffle {
-                let mut rng = thread_rng();
+                let mut rng = rand::thread_rng();
                 words.shuffle(&mut rng);
             }
             if *delay > 0u64 {
