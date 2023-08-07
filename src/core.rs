@@ -1,4 +1,5 @@
 use clap::Parser;
+use colored::Colorize;
 use rand::seq::SliceRandom;
 use serde::Deserialize;
 use std::error::Error;
@@ -7,7 +8,6 @@ use crate::cli::{Cli, Commands};
 
 const WORDLIST_CSV_FILE: &[u8] =
     include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/data/wordlist.csv"));
-const ERROR_HELP_MESSAGE: &str = "For more information, try '--help'.";
 
 #[derive(Clone, Deserialize)]
 struct Word {
@@ -119,11 +119,15 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             }
             // Perhaps this scenario can be handled using 'clap' features
             if (no_chinese, pinyin, english) == (&true, &false, &false) {
-                eprintln!(
-                    "error: it is not possible to use the 'no-chinese' option without using \
-                    the 'pinyin' or 'english' options or both.\n\n{}",
-                    ERROR_HELP_MESSAGE
+                let options_mismatch_error = format!(
+                    "{}: it is not possible to use '{}' without using '{}' or '{}' or both\n\nFor more information, try '{}'.",
+                    "error".red(),
+                    "--no-chinese".bold(),
+                    "--pinyin".bold(),
+                    "--english".bold(),
+                    "--help".bold()
                 );
+                eprintln!("{}", options_mismatch_error);
                 std::process::exit(1);
             }
             if *shuffle {
