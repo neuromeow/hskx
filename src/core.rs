@@ -55,9 +55,9 @@ fn print_question_string_with_delay(
     pinyin: &bool,
     english: &bool,
     answer: &bool,
-    seconds: u64,
+    delay: &u64,
 ) {
-    let delay_duration = time::Duration::from_secs(seconds);
+    let delay_duration = time::Duration::from_secs(*delay);
     for word in words {
         let question_string = render_question_string(word.clone(), no_chinese, pinyin, english);
         println!("{}\n", question_string);
@@ -103,11 +103,9 @@ fn print_wordlist(words: Vec<Word>, numbers: &bool) {
 pub fn run() -> Result<(), Box<dyn Error>> {
     let cli = Cli::parse();
     let mut words = read_records_from_cvs_file_and_deserialize("./src/data/wordlist.csv")?;
-    if let Some(levels) = cli.levels {
-        words.retain(|word| levels.contains(&word.hsk_level))
-    }
     match &cli.command {
         Commands::Train {
+            levels,
             no_chinese,
             pinyin,
             english,
@@ -115,6 +113,9 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             shuffle,
             delay,
         } => {
+            if let Some(level_numbers) = levels {
+                words.retain(|word| level_numbers.contains(&word.hsk_level))
+            }
             // Perhaps this scenario can be handled using 'clap' features
             if (no_chinese, pinyin, english) == (&true, &false, &false) {
                 eprintln!(
@@ -128,15 +129,16 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 let mut rng = thread_rng();
                 words.shuffle(&mut rng);
             }
-            if let Some(seconds) = delay {
-                print_question_string_with_delay(
-                    words, no_chinese, pinyin, english, answer, *seconds,
-                );
+            if *delay > 0u64 {
+                print_question_string_with_delay(words, no_chinese, pinyin, english, answer, delay);
             } else {
                 print_question_string_waiting_input(words, no_chinese, pinyin, english, answer)?;
             }
         }
-        Commands::Wordlist { numbers } => {
+        Commands::Wordlist { levels, numbers } => {
+            if let Some(level_numbers) = levels {
+                words.retain(|word| level_numbers.contains(&word.hsk_level))
+            }
             print_wordlist(words, numbers);
         }
     }
