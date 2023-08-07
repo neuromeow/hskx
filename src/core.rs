@@ -2,7 +2,6 @@ use std::error::Error;
 use std::{io, thread, time};
 
 use clap::Parser;
-use csv;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use serde::Deserialize;
@@ -38,17 +37,16 @@ fn read_records_from_cvs_file_and_deserialize(path: &str) -> Result<Vec<Word>, B
 
 fn render_question_string(word: Word, no_chinese: &bool, pinyin: &bool, english: &bool) -> String {
     let mut question_words = Vec::new();
-    if *no_chinese == false {
+    if !no_chinese {
         question_words.push(word.chinese);
     }
-    if *pinyin == true {
+    if *pinyin {
         question_words.push(word.pinyin);
     }
-    if *english == true {
+    if *english {
         question_words.push(word.english);
     }
-    let question_string = question_words.join(" ");
-    question_string
+    question_words.join(" ")
 }
 
 fn print_question_string_with_delay(
@@ -57,14 +55,14 @@ fn print_question_string_with_delay(
     pinyin: &bool,
     english: &bool,
     answer: &bool,
-    delay: u64,
+    seconds: u64,
 ) {
-    let delay_duration = time::Duration::from_secs(delay);
+    let delay_duration = time::Duration::from_secs(seconds);
     for word in words {
         let question_string = render_question_string(word.clone(), no_chinese, pinyin, english);
         println!("{}\n", question_string);
         thread::sleep(delay_duration);
-        if *answer == true {
+        if *answer {
             println!("{}\n", word);
         }
     }
@@ -83,7 +81,7 @@ fn print_question_string_waiting_input(
         // As a way to wait for user input
         let mut buffer = String::new();
         io::stdin().read_line(&mut buffer)?;
-        if *answer == true {
+        if *answer {
             println!("{}\n", word);
         }
     }
@@ -91,7 +89,7 @@ fn print_question_string_waiting_input(
 }
 
 fn print_wordlist(words: Vec<Word>, numbers: &bool) {
-    if *numbers == true {
+    if *numbers {
         for word in words {
             println!("{} {}", word.word_number, word);
         }
@@ -118,7 +116,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             delay,
         } => {
             // Perhaps this scenario can be handled using 'clap' features
-            if (*no_chinese, *pinyin, *english) == (true, false, false) {
+            if (no_chinese, pinyin, english) == (&true, &false, &false) {
                 eprintln!(
                     "error: it is not possible to use the 'no-chinese' option without using \
                     the 'pinyin' or 'english' options or both.\n\n{}",
@@ -126,13 +124,13 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 );
                 std::process::exit(1);
             }
-            if *shuffle == true {
+            if *shuffle {
                 let mut rng = thread_rng();
                 words.shuffle(&mut rng);
             }
-            if let Some(delay) = delay {
+            if let Some(seconds) = delay {
                 print_question_string_with_delay(
-                    words, no_chinese, pinyin, english, answer, *delay,
+                    words, no_chinese, pinyin, english, answer, *seconds,
                 );
             } else {
                 print_question_string_waiting_input(words, no_chinese, pinyin, english, answer)?;
