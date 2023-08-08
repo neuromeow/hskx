@@ -134,9 +134,9 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 let mut rng = rand::thread_rng();
                 words.shuffle(&mut rng);
             }
-            if *delay > 0u64 {
+            if let Some(delay_value) = delay {
                 print_question_strings_with_delay(
-                    words, no_chinese, pinyin, english, answer, delay,
+                    words, no_chinese, pinyin, english, answer, delay_value,
                 );
             } else {
                 print_question_strings_with_waiting_for_input(
