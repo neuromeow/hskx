@@ -22,8 +22,8 @@ pub enum Commands {
         answer: bool,
         #[arg(short, long)]
         shuffle: bool,
-        #[arg(short, long, default_value_t = 0)]
-        delay: u64,
+        #[arg(short, long, value_parser = clap::value_parser!(u64).range(1..))]
+        delay: Option<u64>,
     },
     Wordlist {
         #[arg(short, long, value_delimiter = ',', use_value_delimiter = true, value_parser = clap::value_parser!(u8).range(1..7))]
@@ -31,4 +31,15 @@ pub enum Commands {
         #[arg(short, long)]
         numbers: bool,
     },
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn verify_cli() {
+        use clap::CommandFactory;
+        Cli::command().debug_assert()
+    }
 }
