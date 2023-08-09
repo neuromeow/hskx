@@ -168,36 +168,36 @@ mod tests {
             level: 1,
         };
         assert_eq!(
-            render_question_string(test_word.clone(), &false, &true, &true),
-            String::from("考试 kǎoshì exam")
-        );
-        assert_eq!(
-            render_question_string(test_word.clone(), &false, &false, &true),
-            String::from("考试 exam")
+            render_question_string(test_word.clone(), &false, &false, &false),
+            String::from("考试")
         );
         assert_eq!(
             render_question_string(test_word.clone(), &false, &true, &false),
             String::from("考试 kǎoshì")
         );
         assert_eq!(
-            render_question_string(test_word.clone(), &false, &false, &false),
-            String::from("考试")
+            render_question_string(test_word.clone(), &false, &false, &true),
+            String::from("考试 exam")
         );
         assert_eq!(
-            render_question_string(test_word.clone(), &true, &true, &true),
-            String::from("kǎoshì exam")
+            render_question_string(test_word.clone(), &false, &true, &true),
+            String::from("考试 kǎoshì exam")
         );
         assert_eq!(
-            render_question_string(test_word.clone(), &true, &false, &true),
-            String::from("exam")
+            render_question_string(test_word.clone(), &true, &false, &false),
+            String::from("")
         );
         assert_eq!(
             render_question_string(test_word.clone(), &true, &true, &false),
             String::from("kǎoshì")
         );
         assert_eq!(
-            render_question_string(test_word.clone(), &true, &false, &false),
-            String::from("")
+            render_question_string(test_word.clone(), &true, &false, &true),
+            String::from("exam")
+        );
+        assert_eq!(
+            render_question_string(test_word.clone(), &true, &true, &true),
+            String::from("kǎoshì exam")
         );
     }
 }
