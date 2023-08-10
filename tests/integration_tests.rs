@@ -12,11 +12,15 @@ fn create_hskx_train_command() -> Command {
     hskx_train_command
 }
 
+// Simulated successful command:
+// `hskx wordlist`
 #[test]
 fn test_hskx_wordlist() {
     create_hskx_wordlist_command().assert().success();
 }
 
+// Simulated successful command:
+// `hskx wordlist --levels 1`
 #[test]
 fn test_hskx_wordlist_with_levels_option_for_one_level() {
     create_hskx_wordlist_command()
@@ -25,6 +29,8 @@ fn test_hskx_wordlist_with_levels_option_for_one_level() {
         .success();
 }
 
+// Simulated successful command:
+// `hskx wordlist --levels 1,2,5`
 #[test]
 fn test_hskx_wordlist_with_levels_option_for_several_levels() {
     create_hskx_wordlist_command()
@@ -33,6 +39,8 @@ fn test_hskx_wordlist_with_levels_option_for_several_levels() {
         .success();
 }
 
+// Simulated successful command:
+// `hskx wordlist --numbers`
 #[test]
 fn test_hskx_wordlist_with_numbers_option() {
     create_hskx_wordlist_command()
@@ -41,6 +49,8 @@ fn test_hskx_wordlist_with_numbers_option() {
         .success();
 }
 
+// Simulated successful command:
+// `hskx wordlist --levels 3 --numbers`
 #[test]
 fn test_hskx_wordlist_with_levels_for_one_level_and_numbers_options() {
     create_hskx_wordlist_command()
@@ -50,6 +60,8 @@ fn test_hskx_wordlist_with_levels_for_one_level_and_numbers_options() {
         .success();
 }
 
+// Simulated successful command:
+// `hskx wordlist --levels 4,6 --numbers`
 #[test]
 fn test_hskx_wordlist_with_levels_for_several_levels_and_numbers_options() {
     create_hskx_wordlist_command()
@@ -59,11 +71,15 @@ fn test_hskx_wordlist_with_levels_for_several_levels_and_numbers_options() {
         .success();
 }
 
+// Simulated successful command:
+// `hskx train`
 #[test]
 fn test_hskx_train() {
     create_hskx_train_command().assert().success();
 }
 
+// Simulated successful command:
+// `hskx train --pinyin`
 #[test]
 fn test_hskx_train_with_pinyin_option() {
     create_hskx_train_command()
@@ -72,6 +88,8 @@ fn test_hskx_train_with_pinyin_option() {
         .success();
 }
 
+// Simulated successful command:
+// `hskx train --english`
 #[test]
 fn test_hskx_train_with_english_option() {
     create_hskx_train_command()
@@ -80,6 +98,8 @@ fn test_hskx_train_with_english_option() {
         .success();
 }
 
+// Simulated successful command:
+// `hskx train --pinyin --english`
 fn test_hskx_train_with_pinyin_and_english_options() {
     create_hskx_train_command()
         .arg("--pinyin")
@@ -88,6 +108,8 @@ fn test_hskx_train_with_pinyin_and_english_options() {
         .success();
 }
 
+// Simulated failed command:
+// `hskx train --no-chinese`
 #[test]
 fn test_hskx_train_with_no_chinese_option() {
     create_hskx_train_command()
@@ -96,6 +118,8 @@ fn test_hskx_train_with_no_chinese_option() {
         .failure();
 }
 
+// Simulated successful command:
+// `hskx train --no-chinese --pinyin`
 #[test]
 fn test_hskx_train_with_no_chinese_and_pinyin_options() {
     create_hskx_train_command()
@@ -105,6 +129,8 @@ fn test_hskx_train_with_no_chinese_and_pinyin_options() {
         .success();
 }
 
+// Simulated successful command:
+// `hskx train --no-chinese --english`
 #[test]
 fn test_hskx_train_with_no_chinese_and_english_options() {
     create_hskx_train_command()
@@ -114,6 +140,8 @@ fn test_hskx_train_with_no_chinese_and_english_options() {
         .success();
 }
 
+// Simulated successful command:
+// `hskx train --no-chinese --pinyin --english`
 #[test]
 fn test_hskx_train_with_no_chinese_and_pinyin_and_english_options() {
     create_hskx_train_command()
@@ -124,6 +152,8 @@ fn test_hskx_train_with_no_chinese_and_pinyin_and_english_options() {
         .success();
 }
 
+// Simulated successful command:
+// `hskx train --levels 1`
 #[test]
 fn test_hskx_train_with_levels_option_for_one_level() {
     create_hskx_train_command()
@@ -132,6 +162,8 @@ fn test_hskx_train_with_levels_option_for_one_level() {
         .success();
 }
 
+// Simulated successful command:
+// `hskx train --levels 1,2,5`
 #[test]
 fn test_hskx_train_with_levels_option_for_several_levels() {
     create_hskx_train_command()
@@ -140,6 +172,8 @@ fn test_hskx_train_with_levels_option_for_several_levels() {
         .success();
 }
 
+// Simulated successful command:
+// `hskx train --answer`
 #[test]
 fn test_hskx_train_with_answer_option() {
     create_hskx_train_command()
@@ -148,6 +182,8 @@ fn test_hskx_train_with_answer_option() {
         .success();
 }
 
+// Simulated successful command:
+// `hskx train --shuffle`
 #[test]
 fn test_hskx_train_with_shuffle_option() {
     create_hskx_train_command()
@@ -156,8 +192,10 @@ fn test_hskx_train_with_shuffle_option() {
         .success();
 }
 
+// Simulated successful command:
+// `hskx train --delay 1`
 #[test]
-#[ignore]
+#[ignore = "Takes a long time to complete"]
 fn test_hskx_train_with_delay_option() {
     create_hskx_train_command()
         .arg("--delay=1")
@@ -165,6 +203,8 @@ fn test_hskx_train_with_delay_option() {
         .success();
 }
 
+// Simulated successful command:
+// `hskx train --no-chinese --pinyin --english --levels 3,4,6 --answer --shuffle`
 #[test]
 fn test_hskx_train_with_all_options_except_delay_option() {
     create_hskx_train_command()
@@ -178,8 +218,10 @@ fn test_hskx_train_with_all_options_except_delay_option() {
         .success();
 }
 
+// Simulated successful command:
+// `hskx train --no-chinese --pinyin --english --levels 3,4,6 --answer --shuffle --delay 1`
 #[test]
-#[ignore]
+#[ignore = "Takes a long time to complete"]
 fn test_hskx_train_with_all_options() {
     create_hskx_train_command()
         .arg("--no-chinese")
