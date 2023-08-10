@@ -114,6 +114,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             shuffle,
             delay,
         } => {
+            // Perhaps this processing should be carried out in the records reading function
             if let Some(level_numbers) = levels {
                 words.retain(|word| level_numbers.contains(&word.level))
             }
@@ -136,7 +137,12 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             }
             if let Some(delay_value) = delay {
                 print_question_strings_with_delay(
-                    words, no_chinese, pinyin, english, answer, delay_value,
+                    words,
+                    no_chinese,
+                    pinyin,
+                    english,
+                    answer,
+                    delay_value,
                 );
             } else {
                 print_question_strings_with_waiting_for_input(
@@ -145,6 +151,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             }
         }
         Commands::Wordlist { levels, numbers } => {
+            // Perhaps this processing should be carried out in the records reading function
             if let Some(level_numbers) = levels {
                 words.retain(|word| level_numbers.contains(&word.level))
             }
@@ -183,6 +190,7 @@ mod tests {
             render_question_string(test_word.clone(), &false, &true, &true),
             String::from("考试 kǎoshì exam")
         );
+        // Real execution with such options will cause the expected error
         assert_eq!(
             render_question_string(test_word.clone(), &true, &false, &false),
             String::from("")
