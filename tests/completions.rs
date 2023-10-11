@@ -100,6 +100,7 @@ fn test_hskx_train_with_english_option() {
 
 // Simulated successful command:
 // `hskx train --pinyin --english`
+#[test]
 fn test_hskx_train_with_pinyin_and_english_options() {
     create_hskx_train_command()
         .arg("--pinyin")
