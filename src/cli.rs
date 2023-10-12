@@ -23,7 +23,7 @@ pub enum Commands {
         pinyin: bool,
         /// English translations of words are displayed
         #[arg(short, long)]
-        english: bool,
+        translations: bool,
         /// Show the word and it's translation after the question
         #[arg(short, long)]
         answer: bool,

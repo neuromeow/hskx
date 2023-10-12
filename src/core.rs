@@ -36,12 +36,12 @@ struct Word {
     number: u32,
     chinese: String,
     pinyin: String,
-    english: String,
+    translations: String,
 }
 
 impl std::fmt::Display for Word {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{} {} {}", self.chinese, self.pinyin, self.english)
+        write!(f, "{} {} {}", self.chinese, self.pinyin, self.translations)
     }
 }
 
@@ -67,7 +67,12 @@ fn read_records_from_hsk_vocabulary_list_and_deserialize(
     Ok(deserialized_records_from_hsk_vocabulary_list)
 }
 
-fn render_question_string(word: Word, no_chinese: &bool, pinyin: &bool, english: &bool) -> String {
+fn render_question_string(
+    word: Word,
+    no_chinese: &bool,
+    pinyin: &bool,
+    translations: &bool,
+) -> String {
     let mut question_string = Vec::new();
     if !(*no_chinese) {
         question_string.push(word.chinese);
@@ -75,8 +80,8 @@ fn render_question_string(word: Word, no_chinese: &bool, pinyin: &bool, english:
     if *pinyin {
         question_string.push(word.pinyin);
     }
-    if *english {
-        question_string.push(word.english);
+    if *translations {
+        question_string.push(word.translations);
     }
     question_string.join(" ")
 }
@@ -85,13 +90,14 @@ fn print_question_strings_with_delay(
     words: Vec<Word>,
     no_chinese: &bool,
     pinyin: &bool,
-    english: &bool,
+    translations: &bool,
     answer: &bool,
     delay: &u64,
 ) {
     let delay_duration = std::time::Duration::from_secs(*delay);
     for word in words {
-        let question_string = render_question_string(word.clone(), no_chinese, pinyin, english);
+        let question_string =
+            render_question_string(word.clone(), no_chinese, pinyin, translations);
         println!("{}\n", question_string);
         std::thread::sleep(delay_duration);
         if *answer {
@@ -104,11 +110,12 @@ fn print_question_strings_with_waiting_for_input(
     words: Vec<Word>,
     no_chinese: &bool,
     pinyin: &bool,
-    english: &bool,
+    translations: &bool,
     answer: &bool,
 ) -> Result<(), Box<dyn Error>> {
     for word in words {
-        let question_string = render_question_string(word.clone(), no_chinese, pinyin, english);
+        let question_string =
+            render_question_string(word.clone(), no_chinese, pinyin, translations);
         println!("{}", question_string);
         // As a way to wait for user input
         let mut buffer = String::new();
@@ -139,19 +146,19 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             level,
             no_chinese,
             pinyin,
-            english,
+            translations,
             answer,
             shuffle,
             delay,
         } => {
             // Perhaps this scenario can be handled using 'clap' features
-            if (no_chinese, pinyin, english) == (&true, &false, &false) {
+            if (no_chinese, pinyin, translations) == (&true, &false, &false) {
                 let options_mismatch_error = format!(
                     "{}: it is not possible to use '{}' without using '{}' or '{}' or both\n\nFor more information, try '{}'.",
                     "error".red(),
                     "--no-chinese".bold(),
                     "--pinyin".bold(),
-                    "--english".bold(),
+                    "--translations".bold(),
                     "--help".bold()
                 );
                 eprintln!("{}", options_mismatch_error);
@@ -167,13 +174,17 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                     words,
                     no_chinese,
                     pinyin,
-                    english,
+                    translations,
                     answer,
                     delay_value,
                 );
             } else {
                 print_question_strings_with_waiting_for_input(
-                    words, no_chinese, pinyin, english, answer,
+                    words,
+                    no_chinese,
+                    pinyin,
+                    translations,
+                    answer,
                 )?;
             }
         }
