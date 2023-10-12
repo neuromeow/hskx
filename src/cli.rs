@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 
-/// Console application to prepare for the Chinese Proficiency Test, known as The Hanyu Shuiping Kaoshi (HSK)
+/// Console application to prepare for the Chinese Proficiency Test, known as HSK (The Hanyu Shuiping Kaoshi)
 #[derive(Parser)]
 #[command(version)]
 pub struct Cli {
@@ -13,8 +13,8 @@ pub enum Commands {
     /// Print words for practice
     Train {
         /// Exam level
-        #[arg(short, long, value_delimiter = ',', use_value_delimiter = true, value_parser = clap::value_parser!(u8).range(1..7))]
-        levels: Option<Vec<u8>>,
+        #[arg(short, long, default_value_t = 1, value_parser = clap::value_parser!(u8).range(1..7))]
+        level: u8,
         /// Chinese characters are not displayed
         #[arg(short, long)]
         no_chinese: bool,
@@ -23,7 +23,7 @@ pub enum Commands {
         pinyin: bool,
         /// English translations of words are displayed
         #[arg(short, long)]
-        english: bool,
+        translations: bool,
         /// Show the word and it's translation after the question
         #[arg(short, long)]
         answer: bool,
@@ -35,11 +35,11 @@ pub enum Commands {
         delay: Option<u64>,
     },
     /// Print a list of words for exam preparation
-    Wordlist {
+    List {
         /// Exam level
-        #[arg(short, long, value_delimiter = ',', use_value_delimiter = true, value_parser = clap::value_parser!(u8).range(1..7))]
-        levels: Option<Vec<u8>>,
-        /// Display the numbers of the words they have in the wordlist
+        #[arg(short, long, default_value_t = 1, value_parser = clap::value_parser!(u8).range(1..7))]
+        level: u8,
+        /// Display the numbers of the words they have in the vocabulary list
         #[arg(short, long)]
         numbers: bool,
     },
