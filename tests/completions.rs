@@ -1,9 +1,9 @@
 use assert_cmd::Command;
 
-fn create_hskx_wordlist_command() -> Command {
-    let mut hskx_wordlist_command = Command::cargo_bin("hskx").unwrap();
-    hskx_wordlist_command.arg("wordlist");
-    hskx_wordlist_command
+fn create_hskx_list_command() -> Command {
+    let mut hskx_list_command = Command::cargo_bin("hskx").unwrap();
+    hskx_list_command.arg("list");
+    hskx_list_command
 }
 
 fn create_hskx_train_command() -> Command {
@@ -13,37 +13,37 @@ fn create_hskx_train_command() -> Command {
 }
 
 // Simulated successful command:
-// `hskx wordlist`
+// `hskx list`
 #[test]
-fn test_hskx_wordlist() {
-    create_hskx_wordlist_command().assert().success();
+fn test_hskx_list() {
+    create_hskx_list_command().assert().success();
 }
 
 // Simulated successful command:
-// `hskx wordlist --level 1`
+// `hskx list --level 2`
 #[test]
-fn test_hskx_wordlist_with_level_option() {
-    create_hskx_wordlist_command()
+fn test_hskx_list_with_level_option() {
+    create_hskx_list_command()
         .arg("--level=2")
         .assert()
         .success();
 }
 
 // Simulated successful command:
-// `hskx wordlist --numbers`
+// `hskx list --numbers`
 #[test]
-fn test_hskx_wordlist_with_numbers_option() {
-    create_hskx_wordlist_command()
+fn test_hskx_list_with_numbers_option() {
+    create_hskx_list_command()
         .arg("--numbers")
         .assert()
         .success();
 }
 
 // Simulated successful command:
-// `hskx wordlist --level 3 --numbers`
+// `hskx list --level 3 --numbers`
 #[test]
-fn test_hskx_wordlist_with_level_and_numbers_options() {
-    create_hskx_wordlist_command()
+fn test_hskx_list_with_level_and_numbers_options() {
+    create_hskx_list_command()
         .arg("--level=3")
         .arg("--numbers")
         .assert()

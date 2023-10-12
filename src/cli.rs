@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 
-/// Console application to prepare for the Chinese Proficiency Test, known as The Hanyu Shuiping Kaoshi (HSK)
+/// Console application to prepare for the Chinese Proficiency Test, known as HSK (The Hanyu Shuiping Kaoshi)
 #[derive(Parser)]
 #[command(version)]
 pub struct Cli {
@@ -35,11 +35,11 @@ pub enum Commands {
         delay: Option<u64>,
     },
     /// Print a list of words for exam preparation
-    Wordlist {
+    List {
         /// Exam level
         #[arg(short, long, default_value_t = 1, value_parser = clap::value_parser!(u8).range(1..7))]
         level: u8,
-        /// Display the numbers of the words they have in the wordlist
+        /// Display the numbers of the words they have in the vocabulary list
         #[arg(short, long)]
         numbers: bool,
     },

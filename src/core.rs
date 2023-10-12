@@ -188,7 +188,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 )?;
             }
         }
-        Commands::Wordlist { level, numbers } => {
+        Commands::List { level, numbers } => {
             let hsk_words = read_records_from_hsk_vocabulary_list_and_deserialize(level)?;
             print_hsk_words(hsk_words, numbers);
         }
