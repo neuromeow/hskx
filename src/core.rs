@@ -202,44 +202,43 @@ mod tests {
 
     #[test]
     fn test_render_question_string() {
-        let test_word = HskWord {
+        let test_hsk_word = HskWord {
             number: 1,
             chinese: String::from("考试"),
             pinyin: String::from("kǎoshì"),
-            english: String::from("exam"),
-            level: 1,
+            translations: String::from("exam"),
         };
         assert_eq!(
-            render_question_string(test_word.clone(), &false, &false, &false),
+            render_question_string(test_hsk_word.clone(), &false, &false, &false),
             String::from("考试")
         );
         assert_eq!(
-            render_question_string(test_word.clone(), &false, &true, &false),
+            render_question_string(test_hsk_word.clone(), &false, &true, &false),
             String::from("考试 kǎoshì")
         );
         assert_eq!(
-            render_question_string(test_word.clone(), &false, &false, &true),
+            render_question_string(test_hsk_word.clone(), &false, &false, &true),
             String::from("考试 exam")
         );
         assert_eq!(
-            render_question_string(test_word.clone(), &false, &true, &true),
+            render_question_string(test_hsk_word.clone(), &false, &true, &true),
             String::from("考试 kǎoshì exam")
         );
         // Real execution with such options will cause the expected error
         assert_eq!(
-            render_question_string(test_word.clone(), &true, &false, &false),
+            render_question_string(test_hsk_word.clone(), &true, &false, &false),
             String::from("")
         );
         assert_eq!(
-            render_question_string(test_word.clone(), &true, &true, &false),
+            render_question_string(test_hsk_word.clone(), &true, &true, &false),
             String::from("kǎoshì")
         );
         assert_eq!(
-            render_question_string(test_word.clone(), &true, &false, &true),
+            render_question_string(test_hsk_word.clone(), &true, &false, &true),
             String::from("exam")
         );
         assert_eq!(
-            render_question_string(test_word.clone(), &true, &true, &true),
+            render_question_string(test_hsk_word.clone(), &true, &true, &true),
             String::from("kǎoshì exam")
         );
     }
