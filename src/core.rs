@@ -6,8 +6,30 @@ use std::error::Error;
 
 use crate::cli::{Cli, Commands};
 
-const WORDLIST_CSV: &[u8] =
-    include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/data/wordlist.csv"));
+const HSK_VOCABULARY_LIST_LEVEL_1: &[u8] = include_bytes!(concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/data/hsk_vocabulary_lists/hsk_level_1.csv"
+));
+const HSK_VOCABULARY_LIST_LEVEL_2: &[u8] = include_bytes!(concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/data/hsk_vocabulary_lists/hsk_level_2.csv"
+));
+const HSK_VOCABULARY_LIST_LEVEL_3: &[u8] = include_bytes!(concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/data/hsk_vocabulary_lists/hsk_level_3.csv"
+));
+const HSK_VOCABULARY_LIST_LEVEL_4: &[u8] = include_bytes!(concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/data/hsk_vocabulary_lists/hsk_level_4.csv"
+));
+const HSK_VOCABULARY_LIST_LEVEL_5: &[u8] = include_bytes!(concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/data/hsk_vocabulary_lists/hsk_level_5.csv"
+));
+const HSK_VOCABULARY_LIST_LEVEL_6: &[u8] = include_bytes!(concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/data/hsk_vocabulary_lists/hsk_level_6.csv"
+));
 
 #[derive(Clone, Deserialize)]
 struct Word {
@@ -15,7 +37,6 @@ struct Word {
     chinese: String,
     pinyin: String,
     english: String,
-    level: u8,
 }
 
 impl std::fmt::Display for Word {
@@ -24,16 +45,26 @@ impl std::fmt::Display for Word {
     }
 }
 
-fn read_records_from_wordlist_csv_and_deserialize() -> Result<Vec<Word>, Box<dyn Error>> {
+fn read_records_from_hsk_vocabulary_list_and_deserialize(
+    level: &u8,
+) -> Result<Vec<Word>, Box<dyn Error>> {
+    let hsk_vocabulary_list = match level {
+        1 => HSK_VOCABULARY_LIST_LEVEL_1,
+        2 => HSK_VOCABULARY_LIST_LEVEL_2,
+        3 => HSK_VOCABULARY_LIST_LEVEL_3,
+        4 => HSK_VOCABULARY_LIST_LEVEL_4,
+        5 => HSK_VOCABULARY_LIST_LEVEL_5,
+        _ => HSK_VOCABULARY_LIST_LEVEL_6,
+    };
     let mut reader = csv::ReaderBuilder::new()
-        .delimiter(b';')
-        .from_reader(WORDLIST_CSV);
-    let mut deserialized_records_from_wordlist_csv = Vec::new();
+        .delimiter(b'\\')
+        .from_reader(hsk_vocabulary_list);
+    let mut deserialized_records_from_hsk_vocabulary_list = Vec::new();
     for record in reader.deserialize() {
         let deserialized_record: Word = record?;
-        deserialized_records_from_wordlist_csv.push(deserialized_record)
+        deserialized_records_from_hsk_vocabulary_list.push(deserialized_record)
     }
-    Ok(deserialized_records_from_wordlist_csv)
+    Ok(deserialized_records_from_hsk_vocabulary_list)
 }
 
 fn render_question_string(word: Word, no_chinese: &bool, pinyin: &bool, english: &bool) -> String {
@@ -103,10 +134,9 @@ fn print_wordlist(words: Vec<Word>, numbers: &bool) {
 
 pub fn run() -> Result<(), Box<dyn Error>> {
     let cli = Cli::parse();
-    let mut words = read_records_from_wordlist_csv_and_deserialize()?;
     match &cli.command {
         Commands::Train {
-            levels,
+            level,
             no_chinese,
             pinyin,
             english,
@@ -114,10 +144,6 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             shuffle,
             delay,
         } => {
-            // Perhaps this processing should be carried out in the records reading function
-            if let Some(level_numbers) = levels {
-                words.retain(|word| level_numbers.contains(&word.level))
-            }
             // Perhaps this scenario can be handled using 'clap' features
             if (no_chinese, pinyin, english) == (&true, &false, &false) {
                 let options_mismatch_error = format!(
@@ -131,6 +157,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 eprintln!("{}", options_mismatch_error);
                 std::process::exit(1);
             }
+            let mut words = read_records_from_hsk_vocabulary_list_and_deserialize(level)?;
             if *shuffle {
                 let mut rng = rand::thread_rng();
                 words.shuffle(&mut rng);
@@ -150,11 +177,8 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 )?;
             }
         }
-        Commands::Wordlist { levels, numbers } => {
-            // Perhaps this processing should be carried out in the records reading function
-            if let Some(level_numbers) = levels {
-                words.retain(|word| level_numbers.contains(&word.level))
-            }
+        Commands::Wordlist { level, numbers } => {
+            let words = read_records_from_hsk_vocabulary_list_and_deserialize(level)?;
             print_wordlist(words, numbers);
         }
     }

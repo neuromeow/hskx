@@ -13,8 +13,8 @@ pub enum Commands {
     /// Print words for practice
     Train {
         /// Exam level
-        #[arg(short, long, value_delimiter = ',', use_value_delimiter = true, value_parser = clap::value_parser!(u8).range(1..7))]
-        levels: Option<Vec<u8>>,
+        #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..7))]
+        level: u8,
         /// Chinese characters are not displayed
         #[arg(short, long)]
         no_chinese: bool,
@@ -37,8 +37,8 @@ pub enum Commands {
     /// Print a list of words for exam preparation
     Wordlist {
         /// Exam level
-        #[arg(short, long, value_delimiter = ',', use_value_delimiter = true, value_parser = clap::value_parser!(u8).range(1..7))]
-        levels: Option<Vec<u8>>,
+        #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..7))]
+        level: u8,
         /// Display the numbers of the words they have in the wordlist
         #[arg(short, long)]
         numbers: bool,
