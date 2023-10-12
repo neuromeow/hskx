@@ -32,14 +32,14 @@ const HSK_VOCABULARY_LIST_LEVEL_6: &[u8] = include_bytes!(concat!(
 ));
 
 #[derive(Clone, Deserialize)]
-struct Word {
+struct HskWord {
     number: u32,
     chinese: String,
     pinyin: String,
     translations: String,
 }
 
-impl std::fmt::Display for Word {
+impl std::fmt::Display for HskWord {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{} {} {}", self.chinese, self.pinyin, self.translations)
     }
@@ -47,7 +47,7 @@ impl std::fmt::Display for Word {
 
 fn read_records_from_hsk_vocabulary_list_and_deserialize(
     level: &u8,
-) -> Result<Vec<Word>, Box<dyn Error>> {
+) -> Result<Vec<HskWord>, Box<dyn Error>> {
     let hsk_vocabulary_list = match level {
         1 => HSK_VOCABULARY_LIST_LEVEL_1,
         2 => HSK_VOCABULARY_LIST_LEVEL_2,
@@ -61,33 +61,33 @@ fn read_records_from_hsk_vocabulary_list_and_deserialize(
         .from_reader(hsk_vocabulary_list);
     let mut deserialized_records_from_hsk_vocabulary_list = Vec::new();
     for record in reader.deserialize() {
-        let deserialized_record: Word = record?;
+        let deserialized_record: HskWord = record?;
         deserialized_records_from_hsk_vocabulary_list.push(deserialized_record)
     }
     Ok(deserialized_records_from_hsk_vocabulary_list)
 }
 
 fn render_question_string(
-    word: Word,
+    hsk_word: HskWord,
     no_chinese: &bool,
     pinyin: &bool,
     translations: &bool,
 ) -> String {
     let mut question_string = Vec::new();
     if !(*no_chinese) {
-        question_string.push(word.chinese);
+        question_string.push(hsk_word.chinese);
     }
     if *pinyin {
-        question_string.push(word.pinyin);
+        question_string.push(hsk_word.pinyin);
     }
     if *translations {
-        question_string.push(word.translations);
+        question_string.push(hsk_word.translations);
     }
     question_string.join(" ")
 }
 
 fn print_question_strings_with_delay(
-    words: Vec<Word>,
+    hsk_words: Vec<HskWord>,
     no_chinese: &bool,
     pinyin: &bool,
     translations: &bool,
@@ -95,46 +95,46 @@ fn print_question_strings_with_delay(
     delay: &u64,
 ) {
     let delay_duration = std::time::Duration::from_secs(*delay);
-    for word in words {
+    for hsk_word in hsk_words {
         let question_string =
-            render_question_string(word.clone(), no_chinese, pinyin, translations);
+            render_question_string(hsk_word.clone(), no_chinese, pinyin, translations);
         println!("{}\n", question_string);
         std::thread::sleep(delay_duration);
         if *answer {
-            println!("{}\n", word);
+            println!("{}\n", hsk_word);
         }
     }
 }
 
 fn print_question_strings_with_waiting_for_input(
-    words: Vec<Word>,
+    hsk_words: Vec<HskWord>,
     no_chinese: &bool,
     pinyin: &bool,
     translations: &bool,
     answer: &bool,
 ) -> Result<(), Box<dyn Error>> {
-    for word in words {
+    for hsk_word in hsk_words {
         let question_string =
-            render_question_string(word.clone(), no_chinese, pinyin, translations);
+            render_question_string(hsk_word.clone(), no_chinese, pinyin, translations);
         println!("{}", question_string);
         // As a way to wait for user input
         let mut buffer = String::new();
         std::io::stdin().read_line(&mut buffer)?;
         if *answer {
-            println!("{}\n", word);
+            println!("{}\n", hsk_word);
         }
     }
     Ok(())
 }
 
-fn print_wordlist(words: Vec<Word>, numbers: &bool) {
+fn print_hsk_words(hsk_words: Vec<HskWord>, numbers: &bool) {
     if *numbers {
-        for word in words {
-            println!("{} {}", word.number, word);
+        for hsk_word in hsk_words {
+            println!("{} {}", hsk_word.number, hsk_word);
         }
     } else {
-        for word in words {
-            println!("{}", word);
+        for hsk_word in hsk_words {
+            println!("{}", hsk_word);
         }
     }
 }
@@ -164,14 +164,14 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 eprintln!("{}", options_mismatch_error);
                 std::process::exit(1);
             }
-            let mut words = read_records_from_hsk_vocabulary_list_and_deserialize(level)?;
+            let mut hsk_words = read_records_from_hsk_vocabulary_list_and_deserialize(level)?;
             if *shuffle {
                 let mut rng = rand::thread_rng();
-                words.shuffle(&mut rng);
+                hsk_words.shuffle(&mut rng);
             }
             if let Some(delay_value) = delay {
                 print_question_strings_with_delay(
-                    words,
+                    hsk_words,
                     no_chinese,
                     pinyin,
                     translations,
@@ -180,7 +180,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 );
             } else {
                 print_question_strings_with_waiting_for_input(
-                    words,
+                    hsk_words,
                     no_chinese,
                     pinyin,
                     translations,
@@ -189,8 +189,8 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             }
         }
         Commands::Wordlist { level, numbers } => {
-            let words = read_records_from_hsk_vocabulary_list_and_deserialize(level)?;
-            print_wordlist(words, numbers);
+            let hsk_words = read_records_from_hsk_vocabulary_list_and_deserialize(level)?;
+            print_hsk_words(hsk_words, numbers);
         }
     }
     Ok(())
@@ -202,7 +202,7 @@ mod tests {
 
     #[test]
     fn test_render_question_string() {
-        let test_word = Word {
+        let test_word = HskWord {
             number: 1,
             chinese: String::from("考试"),
             pinyin: String::from("kǎoshì"),
