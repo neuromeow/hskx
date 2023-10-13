@@ -36,12 +36,12 @@ struct HskWord {
     number: u32,
     chinese: String,
     pinyin: String,
-    translations: String,
+    english: String,
 }
 
 impl std::fmt::Display for HskWord {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{} {} {}", self.chinese, self.pinyin, self.translations)
+        write!(f, "{} {} {}", self.chinese, self.pinyin, self.english)
     }
 }
 
@@ -71,7 +71,7 @@ fn render_question_string(
     hsk_word: HskWord,
     no_chinese: &bool,
     pinyin: &bool,
-    translations: &bool,
+    english: &bool,
 ) -> String {
     let mut question_string = Vec::new();
     if !(*no_chinese) {
@@ -80,8 +80,8 @@ fn render_question_string(
     if *pinyin {
         question_string.push(hsk_word.pinyin);
     }
-    if *translations {
-        question_string.push(hsk_word.translations);
+    if *english {
+        question_string.push(hsk_word.english);
     }
     question_string.join(" ")
 }
@@ -90,14 +90,13 @@ fn print_question_strings_with_delay(
     hsk_words: Vec<HskWord>,
     no_chinese: &bool,
     pinyin: &bool,
-    translations: &bool,
+    english: &bool,
     answer: &bool,
     delay: &u64,
 ) {
     let delay_duration = std::time::Duration::from_secs(*delay);
     for hsk_word in hsk_words {
-        let question_string =
-            render_question_string(hsk_word.clone(), no_chinese, pinyin, translations);
+        let question_string = render_question_string(hsk_word.clone(), no_chinese, pinyin, english);
         println!("{}\n", question_string);
         std::thread::sleep(delay_duration);
         if *answer {
@@ -110,12 +109,11 @@ fn print_question_strings_with_waiting_for_input(
     hsk_words: Vec<HskWord>,
     no_chinese: &bool,
     pinyin: &bool,
-    translations: &bool,
+    english: &bool,
     answer: &bool,
 ) -> Result<(), Box<dyn Error>> {
     for hsk_word in hsk_words {
-        let question_string =
-            render_question_string(hsk_word.clone(), no_chinese, pinyin, translations);
+        let question_string = render_question_string(hsk_word.clone(), no_chinese, pinyin, english);
         println!("{}", question_string);
         // As a way to wait for user input
         let mut buffer = String::new();
@@ -146,19 +144,19 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             level,
             no_chinese,
             pinyin,
-            translations,
+            english,
             answer,
             shuffle,
             delay,
         } => {
             // Perhaps this scenario can be handled using 'clap' features
-            if (no_chinese, pinyin, translations) == (&true, &false, &false) {
+            if (no_chinese, pinyin, english) == (&true, &false, &false) {
                 let options_mismatch_error = format!(
                     "{}: it is not possible to use '{}' without using '{}' or '{}' or both\n\nFor more information, try '{}'.",
                     "error".red(),
                     "--no-chinese".bold(),
                     "--pinyin".bold(),
-                    "--translations".bold(),
+                    "--english".bold(),
                     "--help".bold()
                 );
                 eprintln!("{}", options_mismatch_error);
@@ -169,27 +167,30 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 let mut rng = rand::thread_rng();
                 hsk_words.shuffle(&mut rng);
             }
+            let train_command_title = format!(
+                "Repetition of words presented in the HSK Vocabulary List Level {}",
+                level
+            );
+            println!("{}\n", train_command_title.bold());
             if let Some(delay_value) = delay {
                 print_question_strings_with_delay(
                     hsk_words,
                     no_chinese,
                     pinyin,
-                    translations,
+                    english,
                     answer,
                     delay_value,
                 );
             } else {
                 print_question_strings_with_waiting_for_input(
-                    hsk_words,
-                    no_chinese,
-                    pinyin,
-                    translations,
-                    answer,
+                    hsk_words, no_chinese, pinyin, english, answer,
                 )?;
             }
         }
         Commands::List { level, numbers } => {
             let hsk_words = read_records_from_hsk_vocabulary_list_and_deserialize(level)?;
+            let list_command_title = format!("HSK Vocabulary List Level {}", level);
+            println!("{}\n", list_command_title.bold());
             print_hsk_words(hsk_words, numbers);
         }
     }
@@ -202,44 +203,50 @@ mod tests {
 
     #[test]
     fn test_render_question_string() {
+        let test_chinese_field = "好";
+        let test_pinyin_field = "hǎo";
+        let test_english_field = "good; well; proper; good to; easy to; very; so; (suffix indicating completion or readiness)";
         let test_hsk_word = HskWord {
-            number: 1,
-            chinese: String::from("考试"),
-            pinyin: String::from("kǎoshì"),
-            translations: String::from("exam"),
+            number: 36,
+            chinese: String::from(test_chinese_field),
+            pinyin: String::from(test_pinyin_field),
+            english: String::from(test_english_field),
         };
         assert_eq!(
             render_question_string(test_hsk_word.clone(), &false, &false, &false),
-            String::from("考试")
+            test_chinese_field
         );
         assert_eq!(
             render_question_string(test_hsk_word.clone(), &false, &true, &false),
-            String::from("考试 kǎoshì")
+            format!("{} {}", test_chinese_field, test_pinyin_field)
         );
         assert_eq!(
             render_question_string(test_hsk_word.clone(), &false, &false, &true),
-            String::from("考试 exam")
+            format!("{} {}", test_chinese_field, test_english_field)
         );
         assert_eq!(
             render_question_string(test_hsk_word.clone(), &false, &true, &true),
-            String::from("考试 kǎoshì exam")
+            format!(
+                "{} {} {}",
+                test_chinese_field, test_pinyin_field, test_english_field
+            )
         );
         // Real execution with such options will cause the expected error
         assert_eq!(
             render_question_string(test_hsk_word.clone(), &true, &false, &false),
-            String::from("")
+            ""
         );
         assert_eq!(
             render_question_string(test_hsk_word.clone(), &true, &true, &false),
-            String::from("kǎoshì")
+            test_pinyin_field
         );
         assert_eq!(
             render_question_string(test_hsk_word.clone(), &true, &false, &true),
-            String::from("exam")
+            test_english_field
         );
         assert_eq!(
             render_question_string(test_hsk_word.clone(), &true, &true, &true),
-            String::from("kǎoshì exam")
+            format!("{} {}", test_pinyin_field, test_english_field)
         );
     }
 }
