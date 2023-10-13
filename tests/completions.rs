@@ -95,7 +95,8 @@ fn test_hskx_train_with_no_chinese_option() {
     create_hskx_train_command()
         .arg("--no-chinese")
         .assert()
-        .failure();
+        .failure()
+        .stderr("error: it is not possible to use '--no-chinese' without using '--pinyin' or '--translations' or both\n\nFor more information, try '--help'.\n");
 }
 
 // Simulated successful command:
