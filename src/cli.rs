@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 
-/// Console application to prepare for the Chinese Proficiency Test, known as HSK (The Hanyu Shuiping Kaoshi)
+/// Command line tool to prepare for the Hanyu Shuiping Kaoshi (HSK)
 #[derive(Parser)]
 #[command(version)]
 pub struct Cli {
@@ -10,7 +10,7 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
-    /// Print words for practice
+    /// Start training to repeat words
     Train {
         /// Exam level
         #[arg(short, long, default_value_t = 1, value_parser = clap::value_parser!(u8).range(1..7))]
@@ -18,13 +18,13 @@ pub enum Commands {
         /// Chinese characters are not displayed
         #[arg(short, long)]
         no_chinese: bool,
-        /// Hanyu pinyin are displayed
+        /// Hanyu pinyin transcriptions are displayed
         #[arg(short, long)]
         pinyin: bool,
-        /// English translations of words are displayed
+        /// English translations are displayed
         #[arg(short, long)]
         translations: bool,
-        /// Show the word and it's translation after the question
+        /// Show the word, it's translations and transcription after the question
         #[arg(short, long)]
         answer: bool,
         /// Words appear out of order
@@ -34,7 +34,7 @@ pub enum Commands {
         #[arg(short, long, value_parser = clap::value_parser!(u64).range(1..))]
         delay: Option<u64>,
     },
-    /// Print a list of words for exam preparation
+    /// Print words presented in the vocabulary list
     List {
         /// Exam level
         #[arg(short, long, default_value_t = 1, value_parser = clap::value_parser!(u8).range(1..7))]

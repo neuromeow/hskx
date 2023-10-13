@@ -169,6 +169,11 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 let mut rng = rand::thread_rng();
                 hsk_words.shuffle(&mut rng);
             }
+            let train_command_title = format!(
+                "Repetition of words presented in the HSK Vocabulary List Level {}",
+                level
+            );
+            println!("{}\n", train_command_title.bold());
             if let Some(delay_value) = delay {
                 print_question_strings_with_delay(
                     hsk_words,
@@ -190,6 +195,8 @@ pub fn run() -> Result<(), Box<dyn Error>> {
         }
         Commands::List { level, numbers } => {
             let hsk_words = read_records_from_hsk_vocabulary_list_and_deserialize(level)?;
+            let list_command_title = format!("HSK Vocabulary List Level {}", level);
+            println!("{}\n", list_command_title.bold());
             print_hsk_words(hsk_words, numbers);
         }
     }
