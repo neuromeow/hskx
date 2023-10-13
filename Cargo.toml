@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 assert_cmd = "2.0.12"
 colored = "2.0.4"
-clap = { version = "4.4.2", features = ["derive"] }
+clap = { version = "4.4.6", features = ["derive"] }
 csv = "1.2.2"
 rand = "0.8.5"
 serde = { version = "1", features = ["derive"] }
