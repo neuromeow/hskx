@@ -68,22 +68,22 @@ fn test_hskx_train_with_pinyin_option() {
 }
 
 // Simulated successful command:
-// `hskx train --translations`
+// `hskx train --english`
 #[test]
-fn test_hskx_train_with_translations_option() {
+fn test_hskx_train_with_english_option() {
     create_hskx_train_command()
-        .arg("--translations")
+        .arg("--english")
         .assert()
         .success();
 }
 
 // Simulated successful command:
-// `hskx train --pinyin --translations`
+// `hskx train --pinyin --english`
 #[test]
-fn test_hskx_train_with_pinyin_and_translations_options() {
+fn test_hskx_train_with_pinyin_and_english_options() {
     create_hskx_train_command()
         .arg("--pinyin")
-        .arg("--translations")
+        .arg("--english")
         .assert()
         .success();
 }
@@ -96,7 +96,7 @@ fn test_hskx_train_with_no_chinese_option() {
         .arg("--no-chinese")
         .assert()
         .failure()
-        .stderr("error: it is not possible to use '--no-chinese' without using '--pinyin' or '--translations' or both\n\nFor more information, try '--help'.\n");
+        .stderr("error: it is not possible to use '--no-chinese' without using '--pinyin' or '--english' or both\n\nFor more information, try '--help'.\n");
 }
 
 // Simulated successful command:
@@ -111,24 +111,24 @@ fn test_hskx_train_with_no_chinese_and_pinyin_options() {
 }
 
 // Simulated successful command:
-// `hskx train --no-chinese --translations`
+// `hskx train --no-chinese --english`
 #[test]
-fn test_hskx_train_with_no_chinese_and_translations_options() {
+fn test_hskx_train_with_no_chinese_and_english_options() {
     create_hskx_train_command()
         .arg("--no-chinese")
-        .arg("--translations")
+        .arg("--english")
         .assert()
         .success();
 }
 
 // Simulated successful command:
-// `hskx train --no-chinese --pinyin --translations`
+// `hskx train --no-chinese --pinyin --english`
 #[test]
-fn test_hskx_train_with_no_chinese_and_pinyin_and_translations_options() {
+fn test_hskx_train_with_no_chinese_and_pinyin_and_english_options() {
     create_hskx_train_command()
         .arg("--no-chinese")
         .arg("--pinyin")
-        .arg("--translations")
+        .arg("--english")
         .assert()
         .success();
 }
@@ -175,13 +175,13 @@ fn test_hskx_train_with_delay_option() {
 }
 
 // Simulated successful command:
-// `hskx train --no-chinese --pinyin --translations --level 5 --answer --shuffle`
+// `hskx train --no-chinese --pinyin --english --level 5 --answer --shuffle`
 #[test]
 fn test_hskx_train_with_all_options_except_delay_option() {
     create_hskx_train_command()
         .arg("--no-chinese")
         .arg("--pinyin")
-        .arg("--translations")
+        .arg("--english")
         .arg("--level=5")
         .arg("--answer")
         .arg("--shuffle")
@@ -190,14 +190,14 @@ fn test_hskx_train_with_all_options_except_delay_option() {
 }
 
 // Simulated successful command:
-// `hskx train --no-chinese --pinyin --translations --level 5 --answer --shuffle --delay 1`
+// `hskx train --no-chinese --pinyin --english --level 5 --answer --shuffle --delay 1`
 #[test]
 #[ignore = "Takes a long time to complete"]
 fn test_hskx_train_with_all_options() {
     create_hskx_train_command()
         .arg("--no-chinese")
         .arg("--pinyin")
-        .arg("--translations")
+        .arg("--english")
         .arg("--level=5")
         .arg("--answer")
         .arg("--shuffle")

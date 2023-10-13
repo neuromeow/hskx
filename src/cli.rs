@@ -23,8 +23,8 @@ pub enum Commands {
         pinyin: bool,
         /// English translations are displayed
         #[arg(short, long)]
-        translations: bool,
-        /// Show the word, it's translations and transcription after the question
+        english: bool,
+        /// Show the word, it's transcription and translation after the question
         #[arg(short, long)]
         answer: bool,
         /// Words appear out of order
