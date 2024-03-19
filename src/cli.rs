@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 
-/// Command line tool to prepare for the Hanyu Shuiping Kaoshi (HSK)
+/// Command-line tool to prepare for the Hanyu Shuiping Kaoshi (HSK)
 #[derive(Parser)]
 #[command(version)]
 pub struct Cli {

@@ -1,6 +1,6 @@
 # hskx
 
-`hskx` is a command line tool to prepare for the Chinese Proficiency Test, known as [The Hanyu Shuiping Kaoshi (HSK)](https://en.wikipedia.org/wiki/Hanyu_Shuiping_Kaoshi).
+`hskx` is a command-line tool to prepare for the Chinese Proficiency Test, known as [The Hanyu Shuiping Kaoshi (HSK)](https://en.wikipedia.org/wiki/Hanyu_Shuiping_Kaoshi).
 It helps repeat the words presented in the vocabulary lists for each test level.
 
 ## Installation
@@ -22,57 +22,77 @@ Cargo will build the `hskx` binary and place it in `$HOME/.cargo`.
 
 ## Usage
 
-```
-Command line tool to prepare for the Hanyu Shuiping Kaoshi (HSK)
+`hskx` provides interactive training sessions and vocabulary lists for different HSK levels.
 
-Usage: hskx <COMMAND>
+### Listing Vocabulary
 
-Commands:
-  train  Start training to repeat words
-  list   Print words presented in the vocabulary list
-  help   Print this message or the help of the given subcommand(s)
-
-Options:
-  -h, --help     Print help
-  -V, --version  Print version
-```
+To view the vocabulary list for a specific HSK level, use the `list` command. 
+This is helpful for reviewing the words before starting your practice session:
 
 ```
-Start training to repeat words
-
-Usage: hskx train [OPTIONS]
-
-Options:
-  -l, --level <LEVEL>  Exam level [default: 1]
-  -n, --no-chinese     Chinese characters are not displayed
-  -p, --pinyin         Hanyu pinyin transcriptions are displayed
-  -e, --english        English translations are displayed
-  -a, --answer         Show the word, it's transcription and translation after the question
-  -s, --shuffle        Words appear out of order
-  -d, --delay <DELAY>  Delay between words
-  -h, --help           Print help
-
+hskx list [OPTIONS]
 ```
 
-```
-Print words presented in the vocabulary list
+**Options:**
 
-Usage: hskx list [OPTIONS]
+- `-l, --level <LEVEL>`: Select the HSK level whose vocabulary list you want to display. Default is 1
+- `-n, --numbers`: Show word numbers in the vocabulary list
+- `-h, --help`: Displays help information for the `list` command
 
-Options:
-  -l, --level <LEVEL>  Exam level [default: 1]
-  -n, --numbers        Display the numbers of the words they have in the vocabulary list
-  -h, --help           Print help
-```
+**Example:**
 
 ```
-Print this message or the help of the given subcommand(s)
-
-Usage: hskx help [COMMAND]...
-
-Arguments:
-  [COMMAND]...  Print help for the subcommand(s)
+hskx list --level 2 --numbers
 ```
+
+This command displays the level 2 vocabulary list with word numbers.
+
+### Training Session
+
+Use the `train` command to start a practice session with words from the HSK vocabulary list. 
+You can customize the session using various options:
+
+```
+hskx train [OPTIONS]
+```
+
+**Options:**
+
+- `-l, --level <LEVEL>`: Specify the HSK level for training (1 to 6). Default is 1
+- `-n, --no-chinese`: Hide Chinese characters during the session
+- `-p, --pinyin`: Display Hanyu Pinyin transcriptions
+- `-e, --english`: Show English translations of the words
+- `-a, --answer`: Reveal the word, its transcription, and translation after each question
+- `-s, --shuffle`: Randomize the order of the words
+- `-d, --delay <DELAY>`: Set a delay (in seconds) between words to control pacing
+- `-h, --help`: Displays help information for the `train` command
+
+**Example:**
+
+```
+hskx train --level 3 --pinyin --english --shuffle --delay 5
+```
+
+This command starts a level 3 training session showing both Pinyin and English translations, shuffling the words, with a 5-second delay between them.
+
+### Getting Help
+
+To learn more about `hskx` and its commands, use the `help` command. 
+It provides detailed information about how to use the tool and its features:
+
+```
+hskx help [COMMAND]
+```
+
+Replace `[COMMAND]` with the name of the command you need help with.
+
+**Example:**
+
+```
+hskx help train
+```
+
+This command displays help information specifically for the `train` command.
 
 ## Limitations
 
