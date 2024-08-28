@@ -13,9 +13,9 @@ keywords = ["cli", "education", "chinese"]
 categories = ["command-line-utilities"]
 
 [dependencies]
-assert_cmd = "2.0.12"
-colored = "2.0.4"
-clap = { version = "4.4.6", features = ["derive"] }
-csv = "1.2.2"
+assert_cmd = "2.0.16"
+colored = "2.1.0"
+clap = { version = "4.5.16", features = ["derive"] }
+csv = "1.3.0"
 rand = "0.8.5"
-serde = { version = "1", features = ["derive"] }
+serde = { version = "1.0.209", features = ["derive"] }
